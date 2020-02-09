@@ -2,13 +2,13 @@
 
 ![pub package][version_badge]
 
- Scans QR code and Barcode using Google's Mobile Vision API
+ A Full Screen Scanner for Scanning QR code and Barcode using Google's Mobile Vision API
 
 ## Usage
 
 ```
 import 'package:flutter/material.dart';
-import 'package:flutter_qr_bar_scanner/qr_scanner_camera.dart';
+import 'package:flutter_qr_bar_scanner/qr_bar_scanner_camera.dart';
 
 void main() {
   runApp(MyApp());
@@ -71,23 +71,23 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _camState
           ? Center(
-              child: SizedBox(
-                height: 1000,
-                width: 500,
-                child: QRScannerCamera(
-                  onError: (context, error) => Text(
-                    error.toString(),
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  qrCodeCallback: (code) {
-                    _qrCallback(code);
-                  },
-                ),
-              ),
-            )
-          : Center(
-              child: Text(_qrInfo),
+        child: SizedBox(
+          height: 1000,
+          width: 500,
+          child: QRBarScannerCamera(
+            onError: (context, error) => Text(
+              error.toString(),
+              style: TextStyle(color: Colors.red),
             ),
+            qrCodeCallback: (code) {
+              _qrCallback(code);
+            },
+          ),
+        ),
+      )
+          : Center(
+        child: Text(_qrInfo),
+      ),
     );
   }
 }
@@ -163,6 +163,8 @@ necessarily know about it.
 
 Any kind of contribution will be appreciated.
  
+## License
 
+MIT License
 
 [version_badge]: https://img.shields.io/pub/v/flutter_qr_bar_scanner.svg
