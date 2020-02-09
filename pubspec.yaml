@@ -1,0 +1,19 @@
+name: flutter_qr_bar_scanner
+description: "A Plugin for reading/scanning QR & Bar codes using Google's Mobile Vision API."
+version: 1.0.0
+author: Lutfor Rahman <contact.lutforrahman@gmail.com>
+homepage: https://github.com/contactlutforrahman/flutter_qr_bar_scanner
+
+environment:
+  sdk: ">=2.0.0-dev.0.0 <3.0.0"
+  flutter: ">=0.1.7 <3.0.0"
+
+flutter:
+  plugin:
+    androidPackage: com.github.contactlutforrahman.flutter_qr_bar_scanner
+    pluginClass: FlutterQrBarScannerPlugin
+
+dependencies:
+  flutter:
+    sdk: flutter
+  native_device_orientation: ^0.3.0

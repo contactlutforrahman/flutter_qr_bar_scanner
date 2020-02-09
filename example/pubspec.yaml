@@ -1,0 +1,16 @@
+name: flutter_qr_bar_scanner_example
+description: Demonstrates how to use the flutter_qr_bar_scanner plugin.
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_qr_bar_scanner:
+    path: ../
+
+flutter:
+  uses-material-design: true
