@@ -187,6 +187,7 @@ class Preview extends StatelessWidget {
     return new NativeDeviceOrientationReader(
       builder: (context) {
         var nativeOrientation = NativeDeviceOrientationReader.orientation(context);
+        var boxFitFormat = Platform.isAndroid ? BoxFit.cover : BoxFit.fill;
 
         int baseOrientation = 0;
         if (orientation != 0 && (width > height)) {
@@ -215,7 +216,7 @@ class Preview extends StatelessWidget {
         }
 
         return new FittedBox(
-          fit: fit,
+          fit: boxFitFormat,
           child: new RotatedBox(
             quarterTurns: baseOrientation + nativeOrientationInt,
             child: new SizedBox(
