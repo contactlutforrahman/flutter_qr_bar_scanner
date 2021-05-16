@@ -3,10 +3,10 @@
     <channel>
         <title>Debt Now App - Appcast</title>
         <item>
-            <title>Version 2.1.0</title>
+            <title>Version 2.0.0</title>
             <description> Majore Updates.</description>
             <pubDate>Sun, 17 May 2021 12:00:00 +0000</pubDate>
-            <enclosure url="https://play.google.com/store/apps/details?id=com.moonwink.treasury" sparkle:version="1.15.0" sparkle:os="android" />
+            <enclosure url="https://play.google.com/store/apps/details?id=com.gotchapet.app" sparkle:version="2.0.0" sparkle:os="android" />
         </item>
     </channel>
 </rss>
