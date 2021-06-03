@@ -29,17 +29,17 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _qrInfo = 'Scan a QR/Bar code';
+  String? _qrInfo = 'Scan a QR/Bar code';
   bool _camState = false;
 
-  _qrCallback(String code) {
+  _qrCallback(String? code) {
     setState(() {
       _camState = false;
       _qrInfo = code;
@@ -67,27 +67,27 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title!),
       ),
       body: _camState
           ? Center(
-        child: SizedBox(
-          height: 1000,
-          width: 500,
-          child: QRBarScannerCamera(
-            onError: (context, error) => Text(
-              error.toString(),
-              style: TextStyle(color: Colors.red),
-            ),
-            qrCodeCallback: (code) {
-              _qrCallback(code);
-            },
-          ),
-        ),
-      )
+              child: SizedBox(
+                height: 1000,
+                width: 500,
+                child: QRBarScannerCamera(
+                  onError: (context, error) => Text(
+                    error.toString(),
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  qrCodeCallback: (code) {
+                    _qrCallback(code);
+                  },
+                ),
+              ),
+            )
           : Center(
-        child: Text(_qrInfo),
-      ),
+              child: Text(_qrInfo!),
+            ),
     );
   }
 }

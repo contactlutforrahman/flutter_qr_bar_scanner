@@ -9,22 +9,22 @@ import 'package:native_device_orientation/native_device_orientation.dart';
 
 final WidgetBuilder _defaultNotStartedBuilder = (context) => new Text("Loading Scanner Camera...");
 final WidgetBuilder _defaultOffscreenBuilder = (context) => new Text("Scanner Camera Paused.");
-final ErrorCallback _defaultOnError = (BuildContext context, Object error) {
+final ErrorCallback _defaultOnError = (BuildContext context, Object? error) {
   print("Error reading from scanner camera: $error");
   return new Text("Error reading from scanner camera...");
 };
 
-typedef Widget ErrorCallback(BuildContext context, Object error);
+typedef Widget ErrorCallback(BuildContext context, Object? error);
 
 class QRBarScannerCamera extends StatefulWidget {
   QRBarScannerCamera({
-    Key key,
-    @required this.qrCodeCallback,
+    Key? key,
+    required this.qrCodeCallback,
     this.child,
     this.fit = BoxFit.cover,
-    WidgetBuilder notStartedBuilder,
-    WidgetBuilder offscreenBuilder,
-    ErrorCallback onError,
+    WidgetBuilder? notStartedBuilder,
+    WidgetBuilder? offscreenBuilder,
+    ErrorCallback? onError,
     this.formats,
   })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
         offscreenBuilder = offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
@@ -33,12 +33,12 @@ class QRBarScannerCamera extends StatefulWidget {
         super(key: key);
 
   final BoxFit fit;
-  final ValueChanged<String> qrCodeCallback;
-  final Widget child;
+  final ValueChanged<String?> qrCodeCallback;
+  final Widget? child;
   final WidgetBuilder notStartedBuilder;
   final WidgetBuilder offscreenBuilder;
   final ErrorCallback onError;
-  final List<BarcodeFormats> formats;
+  final List<BarcodeFormats>? formats;
 
   @override
   QRBarScannerCameraState createState() => new QRBarScannerCameraState();
@@ -48,12 +48,12 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
   }
 
   @override
   dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -73,7 +73,7 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
   }
 
   bool onScreen = true;
-  Future<PreviewDetails> _asyncInitOnce;
+  Future<PreviewDetails>? _asyncInitOnce;
 
   Future<PreviewDetails> _asyncInit(num height, num width) async {
     var previewDetails = await FlutterQrReader.start(
@@ -135,7 +135,7 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
                 height: constraints.maxHeight,
                 width: constraints.maxWidth,
                 child: Preview(
-                  previewDetails: details.data,
+                  previewDetails: details.data!,
                   targetHeight: constraints.maxHeight,
                   targetWidth: constraints.maxWidth,
                   fit: widget.fit,
@@ -146,7 +146,7 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
                 return new Stack(
                   children: [
                     preview,
-                    widget.child,
+                    widget.child!,
                   ],
                 );
               }
@@ -165,20 +165,20 @@ class Preview extends StatelessWidget {
   final double height;
   final double width;
   final double targetWidth, targetHeight;
-  final int textureId;
-  final int orientation;
+  final int? textureId;
+  final int? orientation;
   final BoxFit fit;
 
   Preview({
-    @required PreviewDetails previewDetails,
-    @required this.targetHeight,
-    @required this.targetWidth,
-    @required this.fit,
+    required PreviewDetails previewDetails,
+    required this.targetHeight,
+    required this.targetWidth,
+    required this.fit,
   })  : assert(previewDetails != null),
         textureId = previewDetails.textureId,
-        height = previewDetails.height.toDouble(),
-        width = previewDetails.width.toDouble(),
-        orientation = previewDetails.orientation;
+        height = previewDetails.height!.toDouble(),
+        width = previewDetails.width!.toDouble(),
+        orientation = previewDetails.orientation as int?;
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +190,7 @@ class Preview extends StatelessWidget {
 
         int baseOrientation = 0;
         if (orientation != 0 && (width > height)) {
-          baseOrientation = orientation ~/ 90;
+          baseOrientation = orientation! ~/ 90;
           frameHeight = height;
           frameWidth = width;
         } else {
@@ -198,7 +198,7 @@ class Preview extends StatelessWidget {
           frameHeight = width;
         }
 
-        int nativeOrientationInt;
+        late int nativeOrientationInt;
         switch (nativeOrientation) {
           case NativeDeviceOrientation.landscapeLeft:
             nativeOrientationInt = Platform.isAndroid ? 3 : 1;
@@ -221,7 +221,7 @@ class Preview extends StatelessWidget {
             child: new SizedBox(
               height: frameHeight,
               width: frameWidth,
-              child: new Texture(textureId: textureId),
+              child: new Texture(textureId: textureId!),
             ),
           ),
         );

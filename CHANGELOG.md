@@ -9,3 +9,7 @@
 ## [1.0.2] - April 24, 2020
 
 * Fixed pod error
+
+## [2.0.0] - June 03, 2021
+
+* Upgraded to Flutter Null safety
