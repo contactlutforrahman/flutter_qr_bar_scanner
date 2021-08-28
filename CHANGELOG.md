@@ -13,3 +13,7 @@
 ## [2.0.0] - June 03, 2021
 
 * Upgraded to Flutter Null safety
+
+## [2.0.1] - August 28, 2021
+
+* Solved bugs

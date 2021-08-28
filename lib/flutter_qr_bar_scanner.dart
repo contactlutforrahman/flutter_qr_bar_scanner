@@ -1,18 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
-//class FlutterQrBarScanner {
-//  static const MethodChannel _channel =
-//      const MethodChannel('flutter_qr_bar_scanner');
-//
-//  static Future<String> get platformVersion async {
-//    final String version = await _channel.invokeMethod('getPlatformVersion');
-//    return version;
-//  }
-//}
-
 
 class PreviewDetails {
   num? height;
@@ -23,6 +11,7 @@ class PreviewDetails {
   PreviewDetails(this.height, this.width, this.orientation, this.textureId);
 }
 
+// all qr/barcode formats
 enum BarcodeFormats {
   ALL_FORMATS,
   AZTEC,
@@ -44,24 +33,39 @@ const _defaultBarcodeFormats = const [
   BarcodeFormats.ALL_FORMATS,
 ];
 
+// the class which is handling the native call.
+// it's handling the native mobile vision api call
 class FlutterQrReader {
-  static const MethodChannel _channel = const MethodChannel('com.github.contactlutforrahman/flutter_qr_bar_scanner');
+  // flutter method channel for native plugin
+  static const MethodChannel _channel = const MethodChannel(
+      'com.github.contactlutforrahman/flutter_qr_bar_scanner');
   static QrChannelReader channelReader = new QrChannelReader(_channel);
+
   //Set target size before starting
   static Future<PreviewDetails> start({
+    // qr/barcode scanning preview height
     required int height,
+    // qr/barcode scanning preview width
     required int width,
+    // qr/barcode handler to handle the scanned qr code
     required QRCodeHandler qrCodeHandler,
+    // default qr/barcode formats
     List<BarcodeFormats>? formats = _defaultBarcodeFormats,
   }) async {
     final _formats = formats ?? _defaultBarcodeFormats;
     assert(_formats.length > 0);
 
-    List<String> formatStrings = _formats.map((format) => format.toString().split('.')[1]).toList(growable: false);
+    List<String> formatStrings = _formats
+        .map((format) => format.toString().split('.')[1])
+        .toList(growable: false);
 
     channelReader.setQrCodeHandler(qrCodeHandler);
-    var details = await _channel.invokeMethod(
-        'start', {'targetHeight': height, 'targetWidth': width, 'heartbeatTimeout': 0, 'formats': formatStrings});
+    var details = await _channel.invokeMethod('start', {
+      'targetHeight': height,
+      'targetWidth': width,
+      'heartbeatTimeout': 0,
+      'formats': formatStrings
+    });
 
     // invokeMethod returns Map<dynamic,...> in dart 2.0
     assert(details is Map<dynamic, dynamic>);
@@ -71,9 +75,11 @@ class FlutterQrReader {
     num? surfaceHeight = details["surfaceHeight"];
     num? surfaceWidth = details["surfaceWidth"];
 
-    return new PreviewDetails(surfaceHeight, surfaceWidth, orientation, textureId);
+    return new PreviewDetails(
+        surfaceHeight, surfaceWidth, orientation, textureId);
   }
 
+  // calls the stop method of native api to stop the camera
   static Future stop() {
     channelReader.setQrCodeHandler(null);
     return _channel.invokeMethod('stop').catchError(print);
@@ -83,14 +89,20 @@ class FlutterQrReader {
     return _channel.invokeMethod('heartbeat').catchError(print);
   }
 
+  // calls the native api to get supported sizes
   static Future<List<List<int>>?> getSupportedSizes() {
-    return _channel.invokeMethod('getSupportedSizes').catchError(print).then((value) => value as List<List<int>>?);
+    return _channel
+        .invokeMethod('getSupportedSizes')
+        .catchError(print)
+        .then((value) => value as List<List<int>>?);
   }
 }
 
 enum FrameRotation { none, ninetyCC, oneeighty, twoseventyCC }
 
 typedef void QRCodeHandler(String? qr);
+
+// native channel reader
 
 class QrChannelReader {
   QrChannelReader(this.channel) {
@@ -114,5 +126,6 @@ class QrChannelReader {
   }
 
   MethodChannel channel;
+  // qr code handler
   QRCodeHandler? qrCodeHandler;
 }

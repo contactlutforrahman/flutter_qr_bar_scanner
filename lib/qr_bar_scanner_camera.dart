@@ -7,8 +7,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_qr_bar_scanner/flutter_qr_bar_scanner.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
 
-final WidgetBuilder _defaultNotStartedBuilder = (context) => new Text("Loading Scanner Camera...");
-final WidgetBuilder _defaultOffscreenBuilder = (context) => new Text("Scanner Camera Paused.");
+final WidgetBuilder _defaultNotStartedBuilder =
+    (context) => new Text("Loading Scanner Camera...");
+final WidgetBuilder _defaultOffscreenBuilder =
+    (context) => new Text("Scanner Camera Paused.");
 final ErrorCallback _defaultOnError = (BuildContext context, Object? error) {
   print("Error reading from scanner camera: $error");
   return new Text("Error reading from scanner camera...");
@@ -16,35 +18,44 @@ final ErrorCallback _defaultOnError = (BuildContext context, Object? error) {
 
 typedef Widget ErrorCallback(BuildContext context, Object? error);
 
+// to handle camera for qr/ bar code scanner
 class QRBarScannerCamera extends StatefulWidget {
   QRBarScannerCamera({
     Key? key,
+    // function(method) to handle tha call back after scanning qr/bar code
     required this.qrCodeCallback,
     this.child,
+    // to fit the camera to the screen
     this.fit = BoxFit.cover,
     WidgetBuilder? notStartedBuilder,
     WidgetBuilder? offscreenBuilder,
+    // function(method) to handle tha possible errors after scanning qr/bar code
     ErrorCallback? onError,
     this.formats,
   })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
-        offscreenBuilder = offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
+        offscreenBuilder =
+            offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
         onError = onError ?? _defaultOnError,
-        assert(fit != null),
         super(key: key);
 
+  // to fit the camera to the screen
   final BoxFit fit;
+  // function(method) to handle tha call back after scanning qr/bar code
   final ValueChanged<String?> qrCodeCallback;
   final Widget? child;
   final WidgetBuilder notStartedBuilder;
   final WidgetBuilder offscreenBuilder;
+  // function(method) to handle tha possible errors after scanning qr/bar code
   final ErrorCallback onError;
+  // list of qr/bar code formats
   final List<BarcodeFormats>? formats;
 
   @override
   QRBarScannerCameraState createState() => new QRBarScannerCameraState();
 }
 
-class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBindingObserver {
+class QRBarScannerCameraState extends State<QRBarScannerCamera>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -112,9 +123,11 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
 
   @override
   Widget build(BuildContext context) {
-    return new LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+    return new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       if (_asyncInitOnce == null && onScreen) {
-        _asyncInitOnce = _asyncInit(constraints.maxHeight, constraints.maxWidth);
+        _asyncInitOnce =
+            _asyncInit(constraints.maxHeight, constraints.maxWidth);
       } else if (!onScreen) {
         return widget.offscreenBuilder(context);
       }
@@ -153,7 +166,8 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
               return preview;
 
             default:
-              throw new AssertionError("${details.connectionState} not supported.");
+              throw new AssertionError(
+                  "${details.connectionState} not supported.");
           }
         },
       );
@@ -162,10 +176,13 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera> with WidgetsBind
 }
 
 class Preview extends StatelessWidget {
+  // height of preview
   final double height;
+  // width of preview
   final double width;
   final double targetWidth, targetHeight;
   final int? textureId;
+  // orientation of preview
   final int? orientation;
   final BoxFit fit;
 
@@ -174,8 +191,7 @@ class Preview extends StatelessWidget {
     required this.targetHeight,
     required this.targetWidth,
     required this.fit,
-  })  : assert(previewDetails != null),
-        textureId = previewDetails.textureId,
+  })  : textureId = previewDetails.textureId,
         height = previewDetails.height!.toDouble(),
         width = previewDetails.width!.toDouble(),
         orientation = previewDetails.orientation as int?;
@@ -186,7 +202,8 @@ class Preview extends StatelessWidget {
 
     return new NativeDeviceOrientationReader(
       builder: (context) {
-        var nativeOrientation = NativeDeviceOrientationReader.orientation(context);
+        var nativeOrientation =
+            NativeDeviceOrientationReader.orientation(context);
 
         int baseOrientation = 0;
         if (orientation != 0 && (width > height)) {
