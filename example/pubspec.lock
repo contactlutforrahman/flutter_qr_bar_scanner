@@ -63,12 +63,12 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_qr_bar_scanner:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       path: ".."
       relative: true
     source: path
-    version: "3.0.0"
+    version: "3.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter

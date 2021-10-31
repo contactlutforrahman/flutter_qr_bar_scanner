@@ -1,6 +1,6 @@
-# flutter_qr_bar_scanner_example
+# example
 
-Demonstrates how to use the flutter_qr_bar_scanner plugin.
+A new Flutter project.
 
 ## Getting Started
 

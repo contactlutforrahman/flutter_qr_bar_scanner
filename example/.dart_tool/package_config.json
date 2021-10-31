@@ -146,13 +146,13 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "flutter_qr_bar_scanner_example",
+      "name": "example",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-10-31T05:27:29.621746Z",
+  "generated": "2021-10-31T16:47:23.303357Z",
   "generator": "pub",
   "generatorVersion": "2.13.4"
 }
