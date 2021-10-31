@@ -25,3 +25,7 @@
 ## [3.0.1] - October 31, 2021
 
 * Solved missing plugins exception
+
+## [3.0.2] - October 31, 2021
+
+* Fixed bugs
