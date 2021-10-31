@@ -1,24 +1,26 @@
-package com.github.contactlutforrahman.flutter_qr_bar_scanner;
+package com.github.contactlutforrahman.flutter_qr_bar_scanner;;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
+import android.os.Build;
 import android.util.Log;
-import com.google.android.gms.vision.CameraSource;
+
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 
 import java.io.IOException;
 
 class QrReader {
-    private static final String TAG = "cgl.fqs.QrReader";
+    private static final String TAG = "cgr.qrmv.QrReader";
     final QrCamera qrCamera;
     private final Activity context;
     private final QRReaderStartedCallback startedCallback;
     private Heartbeat heartbeat;
-    private CameraSource camera;
 
-    QrReader(int width, int height, Activity context, int barcodeFormats,
+    QrReader(int width, int height, Activity context, BarcodeScannerOptions options,
              final QRReaderStartedCallback startedCallback, final QrReaderCallbacks communicator,
              final SurfaceTexture texture) {
         this.context = context;
@@ -26,10 +28,10 @@ class QrReader {
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             Log.i(TAG, "Using new camera API.");
-            qrCamera = new QrCameraC2(width, height, context, texture, new QrDetector2(communicator, context, barcodeFormats));
+            qrCamera = new QrCameraC2(width, height, texture, context, new QrDetector(communicator, options));
         } else {
             Log.i(TAG, "Using old camera API.");
-            qrCamera = new QrCameraC1(width, height, texture, new QrDetector(communicator, context, barcodeFormats));
+            qrCamera = new QrCameraC1(width, height, texture, context, new QrDetector(communicator, options));
         }
     }
 
@@ -71,13 +73,6 @@ class QrReader {
             heartbeat.stop();
         }
 
-        if (camera != null) {
-            camera.stop();
-            // also stops detector
-            camera.release();
-
-            camera = null;
-        }
         qrCamera.stop();
     }
 
@@ -88,7 +83,14 @@ class QrReader {
     }
 
     private boolean hasCameraHardware(Context context) {
-        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
+        } else {
+            @SuppressLint("UnsupportedChromeOsCameraSystemFeature")
+            boolean hasFeature = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+
+            return hasFeature;
+        }
     }
 
     private boolean checkCameraPermission(Context context) {
@@ -104,7 +106,7 @@ class QrReader {
         void startingFailed(Throwable t);
     }
 
-    public static class Exception extends java.lang.Exception {
+    static class Exception extends java.lang.Exception {
         private Reason reason;
 
         Exception(Reason reason) {

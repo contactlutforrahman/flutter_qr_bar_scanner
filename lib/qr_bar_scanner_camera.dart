@@ -1,35 +1,30 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_qr_bar_scanner/flutter_qr_bar_scanner.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
+import 'package:flutter_qr_bar_scanner/flutter_qr_bar_scanner.dart';
 
 final WidgetBuilder _defaultNotStartedBuilder =
-    (context) => new Text("Loading Scanner Camera...");
+    (context) => Text("Camera Loading ...");
 final WidgetBuilder _defaultOffscreenBuilder =
-    (context) => new Text("Scanner Camera Paused.");
+    (context) => Text("Camera Paused.");
 final ErrorCallback _defaultOnError = (BuildContext context, Object? error) {
-  print("Error reading from scanner camera: $error");
-  return new Text("Error reading from scanner camera...");
+  print("Error reading from camera: $error");
+  return Text("Error reading from camera...");
 };
 
 typedef Widget ErrorCallback(BuildContext context, Object? error);
 
-// to handle camera for qr/ bar code scanner
 class QRBarScannerCamera extends StatefulWidget {
   QRBarScannerCamera({
     Key? key,
-    // function(method) to handle tha call back after scanning qr/bar code
     required this.qrCodeCallback,
     this.child,
-    // to fit the camera to the screen
     this.fit = BoxFit.cover,
     WidgetBuilder? notStartedBuilder,
     WidgetBuilder? offscreenBuilder,
-    // function(method) to handle tha possible errors after scanning qr/bar code
     ErrorCallback? onError,
     this.formats,
   })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
@@ -38,20 +33,16 @@ class QRBarScannerCamera extends StatefulWidget {
         onError = onError ?? _defaultOnError,
         super(key: key);
 
-  // to fit the camera to the screen
   final BoxFit fit;
-  // function(method) to handle tha call back after scanning qr/bar code
   final ValueChanged<String?> qrCodeCallback;
   final Widget? child;
   final WidgetBuilder notStartedBuilder;
   final WidgetBuilder offscreenBuilder;
-  // function(method) to handle tha possible errors after scanning qr/bar code
   final ErrorCallback onError;
-  // list of qr/bar code formats
   final List<BarcodeFormats>? formats;
 
   @override
-  QRBarScannerCameraState createState() => new QRBarScannerCameraState();
+  QRBarScannerCameraState createState() => QRBarScannerCameraState();
 }
 
 class QRBarScannerCameraState extends State<QRBarScannerCamera>
@@ -86,14 +77,14 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
   bool onScreen = true;
   Future<PreviewDetails>? _asyncInitOnce;
 
-  Future<PreviewDetails> _asyncInit(num height, num width) async {
-    var previewDetails = await FlutterQrReader.start(
-      height: height.toInt(),
-      width: width.toInt(),
+  Future<PreviewDetails> _asyncInit(num width, num height) async {
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    return await FlutterQrReader.start(
+      width: (devicePixelRatio * width.toInt()).ceil(),
+      height: (devicePixelRatio * height.toInt()).ceil(),
       qrCodeHandler: widget.qrCodeCallback,
       formats: widget.formats,
     );
-    return previewDetails;
   }
 
   /// This method can be used to restart scanning
@@ -123,16 +114,16 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
 
   @override
   Widget build(BuildContext context) {
-    return new LayoutBuilder(
+    return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       if (_asyncInitOnce == null && onScreen) {
         _asyncInitOnce =
-            _asyncInit(constraints.maxHeight, constraints.maxWidth);
+            _asyncInit(constraints.maxWidth, constraints.maxHeight);
       } else if (!onScreen) {
         return widget.offscreenBuilder(context);
       }
 
-      return new FutureBuilder(
+      return FutureBuilder(
         future: _asyncInitOnce,
         builder: (BuildContext context, AsyncSnapshot<PreviewDetails> details) {
           switch (details.connectionState) {
@@ -144,19 +135,19 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
                 debugPrint(details.error.toString());
                 return widget.onError(context, details.error);
               }
-              Widget preview = new SizedBox(
-                height: constraints.maxHeight,
+              Widget preview = SizedBox(
                 width: constraints.maxWidth,
+                height: constraints.maxHeight,
                 child: Preview(
                   previewDetails: details.data!,
-                  targetHeight: constraints.maxHeight,
                   targetWidth: constraints.maxWidth,
+                  targetHeight: constraints.maxHeight,
                   fit: widget.fit,
                 ),
               );
 
               if (widget.child != null) {
-                return new Stack(
+                return Stack(
                   children: [
                     preview,
                     widget.child!,
@@ -166,8 +157,7 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
               return preview;
 
             default:
-              throw new AssertionError(
-                  "${details.connectionState} not supported.");
+              throw AssertionError("${details.connectionState} not supported.");
           }
         },
       );
@@ -176,69 +166,64 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
 }
 
 class Preview extends StatelessWidget {
-  // height of preview
-  final double height;
-  // width of preview
-  final double width;
+  final double width, height;
   final double targetWidth, targetHeight;
   final int? textureId;
-  // orientation of preview
-  final int? orientation;
+  final int? sensorOrientation;
   final BoxFit fit;
 
   Preview({
     required PreviewDetails previewDetails,
-    required this.targetHeight,
     required this.targetWidth,
+    required this.targetHeight,
     required this.fit,
   })  : textureId = previewDetails.textureId,
-        height = previewDetails.height!.toDouble(),
         width = previewDetails.width!.toDouble(),
-        orientation = previewDetails.orientation as int?;
+        height = previewDetails.height!.toDouble(),
+        sensorOrientation = previewDetails.sensorOrientation as int?;
 
   @override
   Widget build(BuildContext context) {
-    double frameHeight, frameWidth;
-
-    return new NativeDeviceOrientationReader(
+    return NativeDeviceOrientationReader(
       builder: (context) {
         var nativeOrientation =
             NativeDeviceOrientationReader.orientation(context);
 
-        int baseOrientation = 0;
-        if (orientation != 0 && (width > height)) {
-          baseOrientation = orientation! ~/ 90;
-          frameHeight = height;
-          frameWidth = width;
-        } else {
-          frameWidth = height;
-          frameHeight = width;
-        }
-
-        late int nativeOrientationInt;
+        int nativeRotation = 0;
         switch (nativeOrientation) {
-          case NativeDeviceOrientation.landscapeLeft:
-            nativeOrientationInt = Platform.isAndroid ? 3 : 1;
+          case NativeDeviceOrientation.portraitUp:
+            nativeRotation = 0;
             break;
           case NativeDeviceOrientation.landscapeRight:
-            nativeOrientationInt = Platform.isAndroid ? 1 : 3;
+            nativeRotation = 90;
             break;
           case NativeDeviceOrientation.portraitDown:
-            nativeOrientationInt = 2;
+            nativeRotation = 180;
             break;
-          case NativeDeviceOrientation.portraitUp:
+          case NativeDeviceOrientation.landscapeLeft:
+            nativeRotation = 270;
+            break;
           case NativeDeviceOrientation.unknown:
-            nativeOrientationInt = 0;
+          default:
+            break;
         }
 
-        return new FittedBox(
-          fit: fit,
-          child: new RotatedBox(
-            quarterTurns: baseOrientation + nativeOrientationInt,
-            child: new SizedBox(
-              height: frameHeight,
-              width: frameWidth,
-              child: new Texture(textureId: textureId!),
+        int rotationCompensation =
+            ((nativeRotation - sensorOrientation! + 450) % 360) ~/ 90;
+
+        double frameHeight = width;
+        double frameWidth = height;
+
+        return ClipRect(
+          child: FittedBox(
+            fit: fit,
+            child: RotatedBox(
+              quarterTurns: rotationCompensation,
+              child: SizedBox(
+                width: frameWidth,
+                height: frameHeight,
+                child: Texture(textureId: textureId!),
+              ),
             ),
           ),
         );

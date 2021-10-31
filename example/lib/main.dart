@@ -62,23 +62,23 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _camState
           ? Center(
-              child: SizedBox(
-                height: 1000,
-                width: 500,
-                child: QRBarScannerCamera(
-                  onError: (context, error) => Text(
-                    error.toString(),
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  qrCodeCallback: (code) {
-                    _qrCallback(code);
-                  },
-                ),
-              ),
-            )
-          : Center(
-              child: Text(_qrInfo!),
+        child: SizedBox(
+          height: 1000,
+          width: 500,
+          child: QRBarScannerCamera(
+            onError: (context, error) => Text(
+              error.toString(),
+              style: TextStyle(color: Colors.red),
             ),
+            qrCodeCallback: (code) {
+              _qrCallback(code);
+            },
+          ),
+        ),
+      )
+          : Center(
+        child: Text(_qrInfo!),
+      ),
     );
   }
 }
