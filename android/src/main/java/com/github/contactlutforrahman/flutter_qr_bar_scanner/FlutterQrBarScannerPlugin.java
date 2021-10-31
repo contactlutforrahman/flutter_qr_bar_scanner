@@ -35,7 +35,7 @@ import io.flutter.view.TextureRegistry;
  */
 public class FlutterQrBarScannerPlugin implements MethodCallHandler, QrReaderCallbacks, QrReader.QRReaderStartedCallback, PluginRegistry.RequestPermissionsResultListener, FlutterPlugin, ActivityAware {
 
-    private static final String TAG = "cgr.qrmv.QrMobVisPlugin";
+    private static final String TAG = "cgr.qrmv.FlutterQrBarScannerPlugin";
     private static final int REQUEST_PERMISSION = 1;
     private MethodChannel channel;
     private Activity activity;
