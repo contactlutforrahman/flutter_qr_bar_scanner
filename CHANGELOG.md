@@ -21,3 +21,7 @@
 ## [3.0.0] - October 31, 2021
 
 * Solved deprecated API issue
+
+## [3.0.1] - October 31, 2021
+
+* Solved missing plugins exception
