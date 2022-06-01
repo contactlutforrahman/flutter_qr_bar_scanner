@@ -55,7 +55,7 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
 
   @override
   dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
