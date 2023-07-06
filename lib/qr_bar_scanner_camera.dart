@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter_qr_bar_scanner/scanner_frame_painter.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
 import 'package:flutter_qr_bar_scanner/flutter_qr_bar_scanner.dart';
 
@@ -26,7 +25,7 @@ class QRBarScannerCamera extends StatefulWidget {
     WidgetBuilder? notStartedBuilder,
     WidgetBuilder? offscreenBuilder,
     ErrorCallback? onError,
-    this.formats,
+    this.formats,this.frameSize,this.cornerLength,this.cornerWeight,this.frameColor
   })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
         offscreenBuilder =
             offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
@@ -40,6 +39,10 @@ class QRBarScannerCamera extends StatefulWidget {
   final WidgetBuilder offscreenBuilder;
   final ErrorCallback onError;
   final List<BarcodeFormats>? formats;
+  final double? frameSize;
+  final double? cornerLength;
+  final double? cornerWeight;
+  final Color? frameColor;
 
   @override
   QRBarScannerCameraState createState() => QRBarScannerCameraState();
@@ -50,12 +53,12 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -143,6 +146,10 @@ class QRBarScannerCameraState extends State<QRBarScannerCamera>
                   targetWidth: constraints.maxWidth,
                   targetHeight: constraints.maxHeight,
                   fit: widget.fit,
+                  frameSize: widget.frameSize,
+                  frameColor: widget.frameColor,
+                  cornerLength: widget.cornerLength,
+                  cornerWeight: widget.cornerWeight,
                 ),
               );
 
@@ -171,13 +178,21 @@ class Preview extends StatelessWidget {
   final int? textureId;
   final int? sensorOrientation;
   final BoxFit fit;
+  final double? frameSize;
+  final double? cornerLength;
+  final double? cornerWeight;
+  final Color? frameColor;
 
-  Preview({
-    required PreviewDetails previewDetails,
-    required this.targetWidth,
-    required this.targetHeight,
-    required this.fit,
-  })  : textureId = previewDetails.textureId,
+  Preview(
+      {required PreviewDetails previewDetails,
+      required this.targetWidth,
+      required this.targetHeight,
+      required this.fit,
+      this.frameSize,
+      this.cornerLength,
+      this.cornerWeight,
+      this.frameColor})
+      : textureId = previewDetails.textureId,
         width = previewDetails.width!.toDouble(),
         height = previewDetails.height!.toDouble(),
         sensorOrientation = previewDetails.sensorOrientation as int?;
@@ -215,16 +230,29 @@ class Preview extends StatelessWidget {
         double frameWidth = height;
 
         return ClipRect(
-          child: FittedBox(
-            fit: fit,
-            child: RotatedBox(
-              quarterTurns: rotationCompensation,
-              child: SizedBox(
-                width: frameWidth,
-                height: frameHeight,
-                child: Texture(textureId: textureId!),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              FittedBox(
+                fit: fit,
+                child: RotatedBox(
+                  quarterTurns: rotationCompensation,
+                  child: SizedBox(
+                    width: frameWidth,
+                    height: frameHeight,
+                    child: Texture(textureId: textureId!),
+                  ),
+                ),
               ),
-            ),
+              CustomPaint(
+                painter: ScannerFramePainter(
+                    size: frameSize ?? 240,
+                    cornerLength: cornerLength ?? 20,
+                    cornerWeight: cornerWeight ?? 4,
+                    frameColor: frameColor ?? Colors.blue),
+                child: Container(),
+              )
+            ],
           ),
         );
       },
