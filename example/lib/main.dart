@@ -14,30 +14,30 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter QR/Bar Code Reader'),
+      home: const MyHomePage(title: 'Flutter QR/Bar Code Reader'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
+  const MyHomePage({Key? key, this.title}) : super(key: key);
   final String? title;
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   String? _qrInfo = 'Scan a QR/Bar code';
   bool _camState = false;
 
-  _qrCallback(String? code) {
+  void _qrCallback(String? code) {
     setState(() {
       _camState = false;
       _qrInfo = code;
     });
   }
 
-  _scanCode() {
+  void _scanCode() {
     setState(() {
       _camState = true;
     });
@@ -62,23 +62,21 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _camState
           ? Center(
-        child: SizedBox(
-          height: 1000,
-          width: 500,
-          child: QRBarScannerCamera(
-            onError: (context, error) => Text(
-              error.toString(),
-              style: TextStyle(color: Colors.red),
-            ),
-            qrCodeCallback: (code) {
-              _qrCallback(code);
-            },
-          ),
-        ),
-      )
+              child: SizedBox(
+                height: 1000,
+                width: 500,
+                child: QRBarScannerCamera(
+                  onError: (context, error) => Text(
+                    error.toString(),
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  qrCodeCallback: _qrCallback,
+                ),
+              ),
+            )
           : Center(
-        child: Text(_qrInfo!),
-      ),
+              child: Text(_qrInfo!),
+            ),
     );
   }
 }

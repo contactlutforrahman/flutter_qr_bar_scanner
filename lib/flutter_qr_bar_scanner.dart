@@ -1,15 +1,20 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class PreviewDetails {
+  PreviewDetails(
+    this.width,
+    this.height,
+    this.sensorOrientation,
+    this.textureId,
+  );
+
   num? width;
   num? height;
   num? sensorOrientation;
   int? textureId;
-
-  PreviewDetails(
-      this.width, this.height, this.sensorOrientation, this.textureId);
 }
 
 enum BarcodeFormats {
@@ -29,13 +34,13 @@ enum BarcodeFormats {
   UPC_E,
 }
 
-const _defaultBarcodeFormats = const [
+const _defaultBarcodeFormats = [
   BarcodeFormats.ALL_FORMATS,
 ];
 
 class FlutterQrReader {
-  static const MethodChannel _channel = const MethodChannel(
-      'com.github.contactlutforrahman/flutter_qr_bar_scanner');
+  static const MethodChannel _channel =
+      MethodChannel('com.github.contactlutforrahman/flutter_qr_bar_scanner');
   static QrChannelReader channelReader = QrChannelReader(_channel);
 
   //Set target size before starting
@@ -45,50 +50,50 @@ class FlutterQrReader {
     required QRCodeHandler qrCodeHandler,
     List<BarcodeFormats>? formats = _defaultBarcodeFormats,
   }) async {
-    final _formats = formats ?? _defaultBarcodeFormats;
-    assert(_formats.length > 0);
+    final formats0 = formats ?? _defaultBarcodeFormats;
+    assert(formats0.isNotEmpty, 'At least one format must be provided');
 
-    List<String> formatStrings = _formats
+    final formatStrings = formats0
         .map((format) => format.toString().split('.')[1])
         .toList(growable: false);
 
-    channelReader.setQrCodeHandler(qrCodeHandler);
-    var details = await _channel.invokeMethod('start', {
+    channelReader.qrCodeHandler = qrCodeHandler;
+    final details = await _channel.invokeMethod('start', {
       'targetWidth': width,
       'targetHeight': height,
       'heartbeatTimeout': 0,
       'formats': formatStrings,
     });
 
-    // invokeMethod returns Map<dynamic,...> in dart 2.0
-    assert(details is Map<dynamic, dynamic>);
+    if (details! is Map<String, dynamic>) {
+      throw Exception(
+        'details is not a Map<String, dynamic>. '
+        'Got: $details with type ${details.runtimeType}',
+      );
+    }
 
-    int? textureId = details["textureId"];
-    num? orientation = details["surfaceOrientation"];
-    num? surfaceHeight = details["surfaceHeight"];
-    num? surfaceWidth = details["surfaceWidth"];
+    details as Map<dynamic, dynamic>;
+    final textureId = details['textureId'] as int?;
+    final orientation = details['surfaceOrientation'] as num?;
+    final surfaceHeight = details['surfaceHeight'] as num?;
+    final surfaceWidth = details['surfaceWidth'] as num?;
 
     return PreviewDetails(surfaceWidth, surfaceHeight, orientation, textureId);
   }
 
-  static Future stop() {
-    channelReader.setQrCodeHandler(null);
-    return _channel.invokeMethod('stop').catchError(print);
-  }
-
-  static Future heartbeat() {
-    return _channel.invokeMethod('heartbeat').catchError(print);
-  }
-
-  static Future<List<List<int>>?> getSupportedSizes() {
-    return _channel.invokeMethod('getSupportedSizes').catchError(print)
-        as Future<List<List<int>>?>;
+  static Future<void> stop() async {
+    channelReader.qrCodeHandler = null;
+    try {
+      return _channel.invokeMethod('stop');
+    } catch (e) {
+      debugPrint('Error stopping QR reader: $e');
+    }
   }
 }
 
 enum FrameRotation { none, ninetyCC, oneeighty, twoseventyCC }
 
-typedef void QRCodeHandler(String? qr);
+typedef QRCodeHandler = void Function(String? qr);
 
 class QrChannelReader {
   QrChannelReader(this.channel) {
@@ -96,19 +101,18 @@ class QrChannelReader {
       switch (call.method) {
         case 'qrRead':
           if (qrCodeHandler != null) {
-            assert(call.arguments is String);
-            qrCodeHandler!(call.arguments);
+            final arguments = call.arguments;
+            if (arguments is String?) {
+              qrCodeHandler!(arguments);
+            }
           }
-          break;
         default:
-          print("QrChannelHandler: unknown method call received at "
-              "${call.method}");
+          debugPrint(
+            'QrChannelHandler: unknown method call received at '
+            '${call.method}',
+          );
       }
     });
-  }
-
-  void setQrCodeHandler(QRCodeHandler? qrch) {
-    this.qrCodeHandler = qrch;
   }
 
   MethodChannel channel;
