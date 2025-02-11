@@ -1,7 +1,7 @@
 name: flutter_qr_bar_scanner
 description: "A Flutter Plugin for reading/scanning QR & Bar codes using Firebase's Mobile Vision API"
 version: 3.0.2
-homepage: https://github.com/contactlutforrahman/flutter_qr_bar_scanner
+homepage: https://github.com/Towa-Japan/flutter_qr_bar_scanner
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -11,9 +11,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.github.contactlutforrahman.flutter_qr_bar_scanner
-        pluginClass: FlutterQrBarScannerPlugin
-      ios:
+        package: com.towagifu.flutter_qr_bar_scanner
         pluginClass: FlutterQrBarScannerPlugin
 
 dependencies:

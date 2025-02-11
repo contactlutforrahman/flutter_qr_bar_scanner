@@ -1,4 +1,4 @@
-package com.github.contactlutforrahman.flutter_qr_bar_scanner;
+package com.towagifu.flutter_qr_bar_scanner;
 
 import android.graphics.Rect;
 import com.google.mlkit.vision.barcode.common.Barcode;
