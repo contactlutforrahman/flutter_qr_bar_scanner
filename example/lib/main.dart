@@ -1,33 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_qr_bar_scanner/scan_result.dart';
 import 'package:flutter_qr_bar_scanner/qr_bar_scanner_camera.dart';
+import 'package:flutter_qr_bar_scanner/scan_result.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter QR/Bar Code Reader',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter QR/Bar Code Reader'),
-    );
-  }
+  _MyAppState createState() => _MyAppState();
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
-  final String? title;
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class _MyAppState extends State<MyApp> {
   String? _qrInfo = 'Scan a QR/Bar code';
   bool _camState = false;
 
@@ -60,29 +44,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title!),
-      ),
-      body: _camState
-          ? Center(
-              child: SizedBox(
-                height: 1000,
-                width: 500,
-                child: QRBarScannerCamera(
-                  onError: (context, error) => Text(
-                    error.toString(),
-                    style: TextStyle(color: Colors.red),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Flutter QR/Bar Code Reader'),
+        ),
+        body: Center(
+          child: _camState
+              ? SizedBox(
+                  height: 1000,
+                  width: 500,
+                  child: QRBarScannerCamera(
+                    onError: (context, error) => Text(
+                      error.toString(),
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    qrCodeCallback: (code) {
+                      _qrCallback(code);
+                    },
                   ),
-                  qrCodeCallback: (code) {
-                    _qrCallback(code);
-                  },
-                ),
-              ),
-            )
-          : Center(
-              child: Text(_qrInfo!),
-            ),
+                )
+              : Text(_qrInfo!),
+        ),
+      ),
     );
   }
 }

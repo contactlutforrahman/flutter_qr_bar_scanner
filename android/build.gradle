@@ -1,21 +1,21 @@
 group 'com.towagifu.flutter_qr_bar_scanner'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0'
+        classpath 'com.android.tools.build:gradle:8.1.0'
     }
 }
 
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -28,10 +28,6 @@ android {
 
     compileSdkVersion 31
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
     defaultConfig {
         minSdkVersion 19
     }
@@ -42,14 +38,4 @@ android {
 
 dependencies {
     implementation 'com.google.mlkit:barcode-scanning:17.0.2'
-}
-
-
-// if flutter.dir has been defined, use this to add dependency to flutter. This allows the android studio to provide
-// auto-complete & not show errors for flutter stuff =)
-if(project.hasProperty('flutter.dir')) {
-    print("Adding flutter dependency for development purposes.")
-    dependencies {
-        implementation files("${flutter.dir}/bin/cache/artifacts/engine/android-arm/flutter.jar")
-    }
 }

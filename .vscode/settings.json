@@ -1,0 +1,11 @@
+{
+    "dart.flutterSdkPaths": [".fvm/flutter_sdk"],
+    "files.watcherExclude": {
+        "**/.fvm": true
+    },
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "search.exclude": {
+        "**/.fvm": true
+    }
+}
